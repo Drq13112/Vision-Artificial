@@ -11,4 +11,3 @@ import cv2
 img=cv2.imread("../imagenes/llave.jpg",0)
 edgesSobel=cv2.Canny(img,100,100)
 
-import keras
