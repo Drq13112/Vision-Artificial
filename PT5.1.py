@@ -21,31 +21,28 @@ plt.imshow(img,'gray')
 #defino la funcion
 def CuentaObjetos(BW):
     
-    
+    #Uso un filtro de Gauss para suavizar la foto
     img_filtered=cv2.GaussianBlur(BW,(5,5), 0)
-     
+    
+    #Binarizo la foto con OTSU
+    otsu_threshold, img_bin = cv2.threshold(BW, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
+    #Defino el kernel 
     Mat=cv2.getStructuringElement(cv2.MORPH_RECT,(5,5),(-1,-1))
     
-    #Mat=np.ones((5,5),np.uint8)  
-    img_eroded=cv2.erode(img_filtered,Mat,iterations=0)
-    img_dilated=cv2.dilate(img_eroded,Mat,iterations=7)
+    #Someto a la imagen a proceso de erosión y dilaton 
+    #para poder diferenciar adecuamente cada tirafondos
+    img_eroded=cv2.erode(img_bin,Mat,iterations=5)
+    img_dilated=cv2.dilate(img_eroded,Mat,iterations=2)
     
-    #Binarizo con canny
-    img_canny=cv2.Canny(img_dilated,150,200)
-    #Filtro la imagen con el filtro de gauss
-   
-    plt.imshow(img_canny,'gray')
-
-    #Aplico el dectector de contornos
-    #Para ello uso la funcion fincountours de OpenCV
-    (contornos,_) = cv2.findContours(img_canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    #Obtengo la cantidad de objetos que hay e la imagen
+    retval,labels=cv2.connectedComponents(img_dilated)
     
-    # Mostramos el número de monedas por consola
-    print("He encontrado {} objetos".format(len(contornos)))
-     
-    cv2.drawContours(BW,contornos,-1,(0,0,255), 2)
+    #Saco por pantalla la cantidad de objetos que hay
+    #Le resto 1 por que la función tiene en cuenta el fondo
+    print(retval-1)
     
-    cv2.imshow("contornos",img_canny)
+    plt.imshow(img_dilated,'gray')
 
 img=cv2.bitwise_not(img)
 contorno=CuentaObjetos(img)
