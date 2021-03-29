@@ -19,7 +19,7 @@ img=cv2.imread('../imagenes/tirafondos0.png',0)
 
 plt.imshow(img,'gray')
 #defino la funcion
-def CuentaObjetos(BW):
+def CuentaObjetos(BW,blocksize):
     
     #Uso un filtro de Gauss para suavizar la foto
     img_filtered=cv2.GaussianBlur(BW,(5,5), 0)
@@ -28,7 +28,7 @@ def CuentaObjetos(BW):
     otsu_threshold, img_bin = cv2.threshold(BW, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
     #Defino el kernel 
-    Mat=cv2.getStructuringElement(cv2.MORPH_RECT,(5,5),(-1,-1))
+    Mat=cv2.getStructuringElement(cv2.MORPH_RECT,(blocksize,blocksize),(-1,-1))
     
     #Someto a la imagen a proceso de erosión y dilaton 
     #para poder diferenciar adecuamente cada tirafondos
@@ -40,12 +40,11 @@ def CuentaObjetos(BW):
     
     #Saco por pantalla la cantidad de objetos que hay
     #Le resto 1 por que la función tiene en cuenta el fondo
-    print(retval-1)
-    
+    print('Cantidad de objetos en la imagen:',retval-1)
     plt.imshow(img_dilated,'gray')
 
 img=cv2.bitwise_not(img)
-contorno=CuentaObjetos(img)
+contorno=CuentaObjetos(img,5)
 
 
     
