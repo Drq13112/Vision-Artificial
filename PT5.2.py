@@ -9,23 +9,42 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 
-img=cv.imread('../imagenes/sudoku_bin.png',0)
-img_bin=cv.medianBlur(img,5)
-kernel1=np.ones((45,1),np.uint8)
-kernel2=np.ones((1,45),np.uint8)
-"""
-Img_erode = cv.erode(img_bin,kernel,iterations=1)
-Img_dilate = cv.dilate(img_bin,kernel,iterations=1)
-Img_opening = cv.morphologyEx(img_bin, cv.MORPH_OPEN, kernel1)"""
-Img_closing1  =  cv.morphologyEx(img_bin, cv.MORPH_CLOSE, kernel1)
-Img_closing2  =  cv.morphologyEx(img_bin, cv.MORPH_CLOSE, kernel2)
+img_bin=cv.imread('../imagenes/sudoku_bin.png',0)
+img_bin=cv.bitwise_not(img_bin)
 
-Img_background=~Img_closing1+~Img_closing2
+#Defino los kernels
+h_size=img_bin.shape[1] //18
+v_size=img_bin.shape[0]//13
+#kernel3=np.ones((5,5),np.uint8)
+kernel_h=cv.getStructuringElement(cv.MORPH_RECT,(h_size,1))
+kernel_v=cv.getStructuringElement(cv.MORPH_RECT,(1,v_size))
 
-#plt.imshow(Img_closing1,'gray')
-#plt.imshow(Img_closing2,'gray')
-#plt.imshow(Img_background,'gray')
+#Obtengo las columenas y filas
+Img_horizontal  =  cv.morphologyEx(img_bin,cv.MORPH_OPEN,kernel_h)
+Img_vertical  =  cv.morphologyEx(img_bin,cv.MORPH_OPEN,kernel_v)
+                                 
+Img_background=Img_horizontal+Img_vertical
 
-Imgfinal=img_bin+Img_background
-img_filtered=cv.medianBlur(Imgfinal,7)
-#plt.imshow(img_filtered,'gray')
+#Obtengo la imagen final, es decir, solo los números
+img=img_bin-Img_background
+
+#filtro la imagen con un filtro de la mediana
+img=cv.medianBlur(img,7)
+#Elimino las particulas pequeñas con en este algoritmo
+nb_components, output, stats, centroids = cv.connectedComponentsWithStats(img, connectivity=8)
+sizes = stats[1:, -1]; nb_components = nb_components - 1
+
+#Defino el size minimo
+#Todo aquello que tenga un tamaño menor se ese valor es eliminado
+min_size = 100
+
+#
+img2 = np.zeros((output.shape))
+for i in range(0, nb_components):
+    if sizes[i] >= min_size:
+        img2[output == i + 1] = 255
+        
+plt.imshow(img2,'gray')
+
+
+
