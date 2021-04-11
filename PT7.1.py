@@ -33,8 +33,6 @@ img=cv2.GaussianBlur(img,(5,5),0)
 #Filtro de Otsu para binarizar
 img_bin = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
-
-
 #Defino el kernel y hago una apertura y un cierre a la imagen
 kernel3 = np.ones((9, 9), np.uint8)
 img_bin = cv2.morphologyEx(img_bin, cv2.MORPH_CLOSE, kernel3,iterations=3)
