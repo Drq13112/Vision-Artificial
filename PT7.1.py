@@ -52,7 +52,6 @@ contours_not_circles = [0]*num_labels
 for i in range(1,num_labels):
     img_aux = np.zeros_like(labels, np.uint8)
     img_aux[labels == i] = 1
-    
     # Obtengo los contornos
     contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     for j in contours:

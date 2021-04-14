@@ -26,13 +26,18 @@ num_labels, img_labels, stats, cg = cv2.connectedComponentsWithStats(img_bin)
 
 #Creo una imagen de cada numero por separado que ha detectado y lo examino
 #para ver si cumple las caractericticas y por tanto descartarlo o incluirlo 
-img_final=np.zeros_like(img_labels, np.uint8)
+img_final_1=np.zeros_like(img_labels, np.uint8)
+img_final_8=img_final_1
 for j in range(num_labels):
     img_aux = np.zeros_like(img_labels, np.uint8)
     img_aux[img_labels == j] = 1
-    contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-    if j>=1:
+    contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE) 
+    if j>=1:    
+        cnt=contours[0]
+        x,y,w,h = cv2.boundingRect(cnt)
         if len(contours) == 3:
-            img_final=img_aux+img_final
-        
-plt.imshow(img_final,'gray')
+            img_final_8=img_aux+img_final_8
+        if h/w>2:
+            img_final_1=img_aux+img_final_1
+ 
+plt.imshow(img_final_8,'gray')
