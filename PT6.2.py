@@ -32,8 +32,7 @@ for j in range(num_labels):
     img_aux[img_labels == j] = 1
     contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
     if j>=1:
-        for i in range(len(contours)):
-            if i==2:
-                img_final=img_aux+img_final
-
+        if len(contours) == 3:
+            img_final=img_aux+img_final
+        
 plt.imshow(img_final,'gray')
