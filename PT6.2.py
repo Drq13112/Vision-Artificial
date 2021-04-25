@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Mar 18 10:05:11 2021
+Created on Sun Apr 25 19:54:40 2021
 
+@author: david
+"""
+
+"""
+Created on Sat Apr 10 16:08:19 2021
 @author: david
 """
 
@@ -9,35 +14,49 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-#Importo imagen
-img_bin=cv2.imread("../imagenes/sudoku_solo_numeros.png",0)
+def Filtro_tamaño(img_bin,min_size):             
+    #Elimino las particulas pequeñas con en este algoritmo
+    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(img_bin, connectivity=8)
+    sizes = stats[1:, -1]; nb_components = nb_components - 1
+    #Defino el size minimo
+    #Todo aquello que tenga un tamaño menor se ese valor es eliminado
+    img2 = np.zeros((output.shape))
+    for i in range(0, nb_components):
+        if sizes[i] >= min_size:
+            img2[output == i + 1] = 255
+    return img2
 
-#Invierto la imagen
+img=cv2.imread('../imagenes/sudoku.png',0)
+
+#Filtro de Gauss para suavizar
+img=cv2.GaussianBlur(img,(5,5),0)
+
+#Binarizacion adaptativa
+img_bin=cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
+#Invierto de la imagen
 img_bin=cv2.bitwise_not(img_bin)
 
-#Trato de intensificar las caracteristicas de cada numero
-#Para que el programa no se confunda
-Mat=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3),(-1,-1))
-img_bin=cv2.erode(img_bin,Mat)
-img_bin=cv2.dilate(img_bin,Mat)
+#img_bin=cv2.medianBlur(img_bin, 7)
 
-#Determino la cantidad de objetos y etiqueto cada uno
-num_labels, img_labels, stats, cg = cv2.connectedComponentsWithStats(img_bin)
+#Ahora elimino las barras verticales y horizontales
+#Obtengo la cantidad de numeros y barras 
+num_labels,img_labels = cv2.connectedComponents(img_bin)
 
-#Creo una imagen de cada numero por separado que ha detectado y lo examino
-#para ver si cumple las caractericticas y por tanto descartarlo o incluirlo 
-img_final_1=np.zeros_like(img_labels, np.uint8)
-img_final_8=img_final_1
+#Examino cada uno de los objetos   
+img_final=np.zeros_like(img_labels, np.uint8)
 for j in range(num_labels):
     img_aux = np.zeros_like(img_labels, np.uint8)
     img_aux[img_labels == j] = 1
-    contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE) 
-    if j>=1:    
-        cnt=contours[0]
-        x,y,w,h = cv2.boundingRect(cnt)
-        if len(contours) == 3:
-            img_final_8=img_aux+img_final_8
-        if h/w>2:
-            img_final_1=img_aux+img_final_1
- 
-plt.imshow(img_final_8,'gray')
+    contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    cnt=contours[0]
+    if j>=1:
+        for i in range(len(contours)):
+            x,y,w,h = cv2.boundingRect(cnt)
+            if w<50 and h<50:
+                img_final=img_aux+img_final
+
+#Pongo un filtro de aspecto
+img_final=Filtro_tamaño(img_final,120)
+
+plt.imshow(img_final,'gray')
