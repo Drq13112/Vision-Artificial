@@ -9,20 +9,15 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-Arandelas=[]
-Tuercas=[]
-Tornillos=[]
-Llave_fija=[]
-Llave_estrella=[]
-Bridas=[]
-Piñones=[]
-Coronas=[]
 
 #img=cv2.imread('../Imagenes/tuercas_tornillo2.bmp',0)
 #img=cv2.imread('../Imagenes/tuercas_tornillos3.bmp',0)
-#img=cv2.imread('../Imagenes/llave_tornillos.png',0)
-img=cv2.imread('../Imagenes/llaves1.bmp',0)
-
+img=cv2.imread('../Imagenes/llave_tornillos.png',0)
+#img=cv2.imread('../Imagenes/llaves1.bmp',0)
+#img=cv2.imread('../Imagenes/pinon1.png',0)
+#img=cv2.imread('../Imagenes/corona1.bmp',0)
+#img=cv2.imread('../Imagenes/corona0.bmp',0)
+#img=cv2.imread('../Imagenes/brida.png',0)
 
 
 #Filtro de Gauss para suavizar
@@ -38,6 +33,15 @@ img_bin = cv2.morphologyEx(img_bin, cv2.MORPH_CLOSE, kernel3)
 #Obtengo la cantidad de objetos 
 num_labels,labels, stats, centroids = cv2.connectedComponentsWithStats(img_bin)
 
+Arandelas=[0]*num_labels
+Tuercas=[0]*num_labels
+Tornillos=[0]*num_labels
+Llave_fija=[0]*num_labels
+Llave_estrella=[0]*num_labels
+Bridas=[0]*num_labels
+Piñones=[0]*num_labels
+Coronas=[0]*num_labels
+
 #Clasifico
 plt.imshow(img_bin,'gray')
 for i in range(1,num_labels):
@@ -52,33 +56,68 @@ for i in range(1,num_labels):
         x,y,w,h = cv2.boundingRect(cnt)
         perimeter = cv2.arcLength(cnt, True)# pongo true por que el contorno es cerrado
         area = cv2.contourArea(cnt)
-        circularity = 4*np.pi*(area/(perimeter*perimeter)) 
+        circularity = 4*np.pi*(area/(perimeter*perimeter))
+        
+        #Para mostrar el contorno que toma la función
+        imgcontoursRGB=cv2.cvtColor(img_bin,cv2.COLOR_GRAY2RGB)
+        imgcontoursRGB=cv2.drawContours(imgcontoursRGB,contours, -1, (255,0,0),5)
+        cv2.imshow(' ',imgcontoursRGB)
+        cv2.waitKey(0)
+        
+        _,y,_=hierarchy.shape
         if perimeter == 0:
             break
-        if j==2:
-            Llave_estrella.append(i)
+        if y>3:
+            if 0.8<circularity:
+                Bridas.insert(i,i)
+                break
+            else :
+                Coronas.insert(i,i)
+                break
+        if y==3:
+            Llave_estrella.insert(i,i)
             break
-        if j==1:
+        if y==2:
             if 0.8<=circularity and area<310:
-                Arandelas.append(i)
+                Arandelas.insert(i,i)
                 break
             if 0.8<circularity and area<3000:
-                Tuercas.append(i)
+                Tuercas.insert(i,i)
                 break
-        if j==0 and area>3500 and 0.8>circularity:
-            Llave_fija.append(i)
+            if 0.5<circularity and area>10000:
+                Piñones.insert(i,i)
+                break
+            if 0.8<circularity and 1000<area<=3000:
+                Bridas.insert(i,i)
+                break
+        if y==1 and area>3500 and 0.8>circularity:
+            Llave_fija.insert(i,i)
             break
-        if j==0 and area<=3500 and 0.8>circularity:
-            Tornillos.append(i)
+        if y==1 and area<=3500 and 0.8>circularity:
+            Tornillos.insert(i,i)
             break 
            
 Lista_objetos_letra=['Cantidad de arandelas','Cantidad de tuercas',
                'Cantidad de llaves estrella','Cantidad de llaves fijas'
-               ,'Cantidad de tornillos']
-Lista_objetos=[len(Arandelas),len(Tuercas),len(Llave_estrella),len(Llave_fija),len(Tornillos)]
+               ,'Cantidad de tornillos','Cantidad de piñones','Cantidad de coronas','Cantidad de bridas']
+#Lista_objetos=[len(Arandelas),len(Tuercas),len(Llave_estrella),len(Llave_fija),len(Tornillos),len(Piñones),
+#              len(Coronas),len(Bridas)]
+Lista_objetos2=[Arandelas,Tuercas,Llave_estrella,Llave_fija,Tornillos,Piñones,
+               Coronas,Bridas]
 
+Lista_Aux=[]
+Lista_Aux2=[]
 for i in range(len(Lista_objetos_letra)):
-    print(Lista_objetos_letra[i],Lista_objetos[i])
+    Lista_Aux=Lista_objetos2[i]
+    for j in range(len(Lista_objetos2[i])):
+        if Lista_Aux[j]!=0:
+            Lista_Aux2.append(j)
+            
+    print(Lista_objetos_letra[i],len(Lista_Aux2))
+    if len(Lista_objetos2[i])!=num_labels:  
+        print('Está formado por los objetos:',Lista_Aux2)
+    Lista_Aux2=[]
+        
 
             
             
