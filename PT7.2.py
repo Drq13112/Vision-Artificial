@@ -58,12 +58,13 @@ for i in range(1,num_labels):
         area = cv2.contourArea(cnt)
         circularity = 4*np.pi*(area/(perimeter*perimeter))
         
-        #Para mostrar el contorno que toma la función
+        #Para mostrar el contorno que toma la 
+        """
         imgcontoursRGB=cv2.cvtColor(img_bin,cv2.COLOR_GRAY2RGB)
         imgcontoursRGB=cv2.drawContours(imgcontoursRGB,contours, -1, (255,0,0),5)
         cv2.imshow(' ',imgcontoursRGB)
         cv2.waitKey(0)
-        
+        """
         _,y,_=hierarchy.shape
         if perimeter == 0:
             break
