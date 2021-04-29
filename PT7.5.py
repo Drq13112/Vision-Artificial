@@ -21,7 +21,8 @@ import matplotlib.pyplot as plt
 #img = cv2.imread('../imagenes/Botella1.bmp',0)
 #img = cv2.imread('../imagenes/Botella5.bmp',0)
 #img = cv2.imread('../imagenes/Botella10.bmp',0)
-img = cv2.imread('../imagenes/Botella17.bmp',0)
+#img = cv2.imread('../imagenes/Botella17.bmp',0)
+img = cv2.imread('../imagenes/Botella18.bmp',0)
  
 def Detecta_lineas(img,cantidad_lineas):
     
