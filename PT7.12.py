@@ -90,7 +90,7 @@ def SeparaObjetos(img):
         plt.subplot(1, 2, i+1),plt.imshow(img_bin,'gray')
                 
     return List_imagenes_corregidas
-    
+#-----------------------------------------------------------------------------------    
 img=cv2.imread('../imagenes/parllaves1.JPG',0)
 img=cv2.bitwise_not(img)
 
