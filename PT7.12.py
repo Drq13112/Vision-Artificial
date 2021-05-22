@@ -11,10 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def SACA_OBJETO(img,num_labels,img_labels):
-    """
-    img_1 = np.zeros_like(img_labels, np.uint8)
-    img_2 = np.zeros_like(img_labels, np.uint8)
-    """
+    
     #Defino el contorno del objeto y su orientación 
     
     list_imagenes=[]
@@ -33,7 +30,7 @@ def SACA_OBJETO(img,num_labels,img_labels):
 
 def SeparaObjetos(img):
     
-    # Primero suavizamos la imagen y luego la binarizamoscon Otsu
+    # Primero filtramos la imagen y luego la binarizamos con Otsu
     img_suavizada = cv2.medianBlur(img,7)
     _, img_bin = cv2.threshold(img_suavizada, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
@@ -68,6 +65,7 @@ def SeparaObjetos(img):
         #Recorto la imagen 
         x,y,w,h = cv2.boundingRect(contours2[0])
         img_bin = img_bin[y:y+h,x:x+w]
+        
         #Compruebo que la imagen esta colocada correctamente
         img_abajo=img_bin[int(img_bin.shape[0]/2.1):img_bin.shape[0]]
         img_arriba=img_bin[0:int(img_bin.shape[0]/2.1)]
@@ -91,15 +89,23 @@ def SeparaObjetos(img):
                 
     return List_imagenes_corregidas
     
+
+
 img=cv2.imread('../imagenes/parllaves1.JPG',0)
+#Invierto la imagen
 img=cv2.bitwise_not(img)
 
+#La funcion separa objetos devuelve un array
+#con todos los objetos de la imagen separados en 
+#imagenes independientes y con los objetos correctamente orientados
 List_imagenes_corregidas=SeparaObjetos(img) 
 
 plt.show()
 img1=List_imagenes_corregidas[0]
 img2=List_imagenes_corregidas[1]
 
+#Normalizo el tamaño de las imagenes, 
+#siendo la más pequeña la que marca el tamaño de los marcos
 if img1.shape[1]>img2.shape[1]:
     x=img1.shape[1]
 else:
@@ -110,13 +116,14 @@ if img1.shape[0]>img2.shape[0]:
 else:
     y=img2.shape[0]
     
-
+#Rescalo las imagenes a losnuevos marcos
 img1 = cv2.resize(img1,(x,y), interpolation=cv2.INTER_CUBIC)
 img2 = cv2.resize(img2,(x,y), interpolation=cv2.INTER_CUBIC)
 #img2=cv2.bitwise_not(img2)
 img_resta1=img1-img2
 img_resta2=-img1+img2
 
+#Saco las areas de cada uno de los objetos
 contours,_= cv2.findContours(img1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 area1 = cv2.contourArea(contours[0])
 
