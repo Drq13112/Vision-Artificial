@@ -88,9 +88,13 @@ def SeparaObjetos(img):
         plt.subplot(1, 2, i+1),plt.imshow(img_bin,'gray')
                 
     return List_imagenes_corregidas
+<<<<<<< HEAD
     
 
 
+=======
+#-----------------------------------------------------------------------------------    
+>>>>>>> 9228e27ac0185b4d5dcd6f8d968435cf12147210
 img=cv2.imread('../imagenes/parllaves1.JPG',0)
 #Invierto la imagen
 img=cv2.bitwise_not(img)
