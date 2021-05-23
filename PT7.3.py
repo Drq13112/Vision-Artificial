@@ -3,7 +3,8 @@
 Created on Sat May 22 18:32:12 2021
 
 @author: david
-Programa que clasifica objetos presentes en la imagen emdinate el método K-means
+
+Programa que clasifica objetos presentes en la imagen mediante el método K-means
 """
 
 import cv2
@@ -94,7 +95,7 @@ for etiq in range(1,num_labels):
         
         
         
-#Lo coloco en dos columnas quitando el primer elemento
+#Lo coloco en dos columnas quitando el primer elemento y luego concateno los dos arrays
 Z = np.hstack((perim[1:,:],hull_area[1:,:]))
 z= np.hstack((circularidad[1:,:],aspect_ratio[1:,:]))
 Z= np.concatenate((Z,z),axis=1)

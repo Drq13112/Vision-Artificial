@@ -18,7 +18,7 @@ def SACA_OBJETO(img,num_labels,img_labels):
     list_contours=[]
     for j in range(1,num_labels):
         img_aux = np.zeros_like(img_labels, np.uint8)
-        img_aux[img_labels == j] = 1
+        img_aux[img_labels == j] = 255
         
         contours,_ = cv2.findContours(img_aux, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
        
@@ -44,7 +44,12 @@ def SeparaObjetos(img):
     #Obtengo la cantidad de objetos, los mismos y sus stats
     num_labels, img_labels, stats, cg = cv2.connectedComponentsWithStats(img_bin)
     
-    
+    """
+    Genero dos arrays distintos. En uno almaceno las imagenes de cada objeto individual
+    y en el otro almaceno el contorno asociado a este objeto.
+    Lo hago así para mantener un orden dentro. Si no lo hiciera así, tendría un problema
+    de orden el cual haría que el algoritmo no funcionase correctamente.
+    """
         
     List_imagenes,List_contours=SACA_OBJETO(img_bin, num_labels, img_labels)
     List_imagenes_corregidas=[]
@@ -73,7 +78,7 @@ def SeparaObjetos(img):
         contours3, hierarchy = cv2.findContours(img_abajo, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
         
         #Lo imprimo por pantalla
-        imgcontoursRGB=cv2.cvtColor(img_bin,cv2.COLOR_GRAY2RGB)
+        imgcontoursRGB=cv2.cvtColor(img_abajo,cv2.COLOR_GRAY2RGB)
         imgcontoursRGB=cv2.drawContours(imgcontoursRGB,contours3, -1, (255,0,0),5)
         cv2.imshow(' ',imgcontoursRGB)
         cv2.waitKey(0)
@@ -88,13 +93,13 @@ def SeparaObjetos(img):
         plt.subplot(1, 2, i+1),plt.imshow(img_bin,'gray')
                 
     return List_imagenes_corregidas
-<<<<<<< HEAD
+
     
 
 
-=======
+
 #-----------------------------------------------------------------------------------    
->>>>>>> 9228e27ac0185b4d5dcd6f8d968435cf12147210
+
 img=cv2.imread('../imagenes/parllaves1.JPG',0)
 #Invierto la imagen
 img=cv2.bitwise_not(img)
