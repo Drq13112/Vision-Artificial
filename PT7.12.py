@@ -4,7 +4,7 @@ Created on Thu Apr 29 11:58:50 2021
 
 @author: david
 
-Diseño un agloritmo que detecta si los objetos de la imagen son iguales
+Diseño un algoritmo que cuantifica el area de diferencia entre dos imagenes
 """
 import cv2 
 import numpy as np
@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 def SACA_OBJETO(img,num_labels,img_labels):
     
     #Defino el contorno del objeto y su orientación 
-    
     list_imagenes=[]
     list_contours=[]
     for j in range(1,num_labels):
@@ -72,6 +71,8 @@ def SeparaObjetos(img):
         img_bin = img_bin[y:y+h,x:x+w]
         
         #Compruebo que la imagen esta colocada correctamente
+        #Para ello parto la imagen por la mitad y compuebo la cantidad de
+        #contornos que hay en esa mitad
         img_abajo=img_bin[int(img_bin.shape[0]/2.1):img_bin.shape[0]]
         img_arriba=img_bin[0:int(img_bin.shape[0]/2.1)]
         
@@ -91,6 +92,7 @@ def SeparaObjetos(img):
             
         List_imagenes_corregidas.append(img_bin)    
         plt.subplot(1, 2, i+1),plt.imshow(img_bin,'gray')
+        plt.axis(False)
                 
     return List_imagenes_corregidas
 
@@ -101,6 +103,7 @@ def SeparaObjetos(img):
 #-----------------------------------------------------------------------------------    
 
 img=cv2.imread('../imagenes/parllaves1.JPG',0)
+
 #Invierto la imagen
 img=cv2.bitwise_not(img)
 
@@ -113,9 +116,17 @@ plt.show()
 img1=List_imagenes_corregidas[0]
 img2=List_imagenes_corregidas[1]
 
+#Saco las areas de cada uno de los objetos y su resta
+contours,_= cv2.findContours(img1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+area1 = cv2.contourArea(contours[0])
+
+contours,_= cv2.findContours(img2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+area2 = cv2.contourArea(contours[0])
+
 #Normalizo el tamaño de las imagenes, 
-#siendo la más pequeña la que marca el tamaño de los marcos
-if img1.shape[1]>img2.shape[1]:
+#siendo la más grande la que marca el tamaño de los marcos
+if img1.shape[1]<img2.shape[1]:
     x=img1.shape[1]
 else:
     x=img2.shape[1]
@@ -125,22 +136,19 @@ if img1.shape[0]>img2.shape[0]:
 else:
     y=img2.shape[0]
     
-#Rescalo las imagenes a losnuevos marcos
+#Rescalo las imagenes a los nuevos marcos
 img1 = cv2.resize(img1,(x,y), interpolation=cv2.INTER_CUBIC)
 img2 = cv2.resize(img2,(x,y), interpolation=cv2.INTER_CUBIC)
-#img2=cv2.bitwise_not(img2)
+
 img_resta1=img1-img2
 img_resta2=-img1+img2
 
-#Saco las areas de cada uno de los objetos
-contours,_= cv2.findContours(img1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-area1 = cv2.contourArea(contours[0])
-
-contours,_= cv2.findContours(img2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-area2 = cv2.contourArea(contours[0])
-
 print(area1,'and', area2,'resta:', area2-area1)
 plt.subplot(1,2,1), plt.imshow(img_resta1,'gray')
+plt.title('img1-img2')
+plt.axis(False)
 plt.subplot(1,2,2), plt.imshow(img_resta2,'gray')
+plt.title('-img1+img2')
+plt.axis(False)
     
 

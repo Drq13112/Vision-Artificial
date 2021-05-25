@@ -1,23 +1,27 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Apr 11 21:46:05 2021
-https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_houghlines/py_houghlines.html
-@author: eusebio
+
+@author: David
+
+Detectar rectas en imágenes
 """
 
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-img = cv2.imread('../imagenes/Carriles.jpg',0)
+img = cv2.imread('../imagenes/botella1.bmp',0)
 output = img_color=cv2.merge([img,img,img])
-edges = cv2.Canny(img,50,150)
-#llamaos a houghlines con la imagen de contornos
+edges = cv2.Canny(img,200,250)
+
+#llamo a houghlines con la imagen de contornos
+
 #1 es la resolucion en rho
 #pi/180 es un grado de resolucion en tita
-#el ultimo parametro es el umbral del contador para considerar recta
+#el último parametro es el umbral del contador para considerar recta
 #cuanto mas bajo más rectas saldrán
-lines = cv2.HoughLines(edges,1,np.pi/180, 270)
+lines = cv2.HoughLines(edges,1,np.pi/180, 100)
 if lines is None:
     print('No se han encontrado rectas. Baja el umbral')
 else:

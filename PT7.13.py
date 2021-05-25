@@ -42,6 +42,7 @@ def Elimina_restos(img_bin):
 
     cv2.imshow('img_bin_filtrada',img_bin_filtrada)
     cv2.waitKey(0)  
+    
     return img_bin_filtrada
         
 
@@ -54,6 +55,7 @@ def SeparaObjetos(img):
     # Binarizamos con Otsu
     _, img_bin = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
+    #Trato de separar un poco más las fichas del dominó
     #Defino el kernel 
     Mat=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3),(-1,-1))
     img_bin=cv2.erode(img_bin,Mat,iterations=2)
@@ -62,7 +64,7 @@ def SeparaObjetos(img):
     cv2.imshow('img_bin',img_bin)
     cv2.waitKey(0) 
     
-    #Con esta función elimno los restos qeu hayan quedado depués 
+    #Con esta función elimno los restos que hayan quedado depués 
     #de haber hecho un erode
     
     img_bin_filtrada=Elimina_restos(img_bin)
@@ -74,4 +76,4 @@ img=cv2.imread('../imagenes/domino-65136_1280.jpg',0)
 
 cantidad=SeparaObjetos(img) 
 
-print('La cantidad de pìezas detectadas es: ',cantidad)
+print('La cantidad de piezas detectadas es: ',cantidad)

@@ -3,6 +3,9 @@
 Created on Thu Apr 15 13:19:04 2021
 
 @author: david
+
+Nivel botellas Hough
+
 README:
 Se presupone que al tratarse de una linea de botellas todas las botellas serán
 igual de altas y que la camara estará situada siempre a la misma altura y a la 
@@ -30,9 +33,9 @@ def Detecta_lineas(img,cantidad_lineas):
     img=img[int(img.shape[0]/2):img.shape[0]]
     
     #Saco los contornos con Canny
-    edges = cv2.Canny(img,50,150)
+    edges = cv2.Canny(img,200,250)
     
-    #fijo el umbral a cero porque sera la propia función la que encuentre el umbral idoneo
+    #fijo el umbral a 0 porque sera la propia función la que encuentre el umbral idoneo
     umbral=0
     
     #La variable bandera me sirve para coger solo la primera recta que detecte.

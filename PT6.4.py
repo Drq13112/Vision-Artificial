@@ -3,78 +3,47 @@
 Created on Sat Apr 10 16:08:19 2021
 
 @author: david
+
+Extracción de características diversas
 """
 
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def show_num_etiquetas(img_bin):
-    num_labels, img_labels, stats, centroids = cv2.connectedComponentsWithStats(
-        img_bin)
-
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    img_color = cv2.merge([img_bin, img_bin, img_bin])
-    for i in range(1, num_labels): 
-        
-        cg = (int(centroids[i][0]), int(centroids[i][1]))
-        cv2.circle(img_color, cg, 3, (255, 0, 0), -1)
-        cv2.putText(img_color, str(i), cg, font,
-                    1, (255, 0, 0), 2, cv2.LINE_AA)
-    plt.imshow(img_color)
-    plt.axis('off')
-    plt.title("Imagen")
-    plt.show()
     
-img=cv2.imread('../imagenes/sudoku.png',0)
-
-#Filtro de Gauss para suavizar
-img=cv2.GaussianBlur(img,(5,5),0)
-
-#Binarizacion adaptativa
-img_bin=cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+img=cv2.imread('../imagenes/sudoku_limpia.png',0)
 
 #Invierto de la imagen
-img_bin=cv2.bitwise_not(img_bin)
+img=cv2.bitwise_not(img)
 
-#Ahora elimino las barras verticales y horizontales
-#Obtengo la cantidad de numeros y barras 
-num_labels,img_labels = cv2.connectedComponents(img_bin)
-
-#Examino cada uno de los objetos   
-img_final=np.zeros_like(img_labels, np.uint8)
-for j in range(1,num_labels):
-    img_aux = np.zeros_like(img_labels, np.uint8)
-    img_aux[img_labels == j] = 1
-    contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cnt=contours[0]
-    for i in range(len(contours)):
-        x,y,w,h = cv2.boundingRect(cnt)
-        if w<50 and h<50:
-            img_final=img_aux+img_final
-
-#Pongo un filtro de tamaño
-img_final = cv2.medianBlur(img_final, 7)
-
-num_labels,img_labels, stats, centroids = cv2.connectedComponentsWithStats(img_final, connectivity=8)
+#Determino la cantidad de objetos que hay en la imagen
+num_labels,img_labels, stats, centroids = cv2.connectedComponentsWithStats(img, connectivity=8)
 font = cv2.FONT_HERSHEY_SIMPLEX
-img_color = cv2.merge([img_final, img_final, img_final])
-lista=[]
+
+#Genero la img en RGB para que se vea de color lo que dibuje en la imagen
+img_color = cv2.merge([img, img, img])
+
+#Genero la lsita donde voya a almacenar las carateristicas de cada número
+#Añado un cero para tener el cuenta el fondo y que el numero de la imagen concuerde
+#con su posición en el vector
+lista=[0]
 
 img_final2=np.zeros_like(img_labels, np.uint8)
+
 for j in range(1,num_labels):
     img_aux = np.zeros_like(img_labels, np.uint8)
     img_aux[img_labels == j] = 1
     
     
-    
+    #Centro de gravedad
     cg = (int(centroids[j][0]), int(centroids[j][1]))
     cv2.circle(img_color, cg, 3, (255, 0, 0), -1)
-    cv2.putText(img_color, str(j), cg, font,
-                1, (255, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(img_color, str(j), cg, font, 1, (255, 0, 0), 2, cv2.LINE_AA)
     
-    contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, hierarchy = cv2.findContours(img_aux, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     cnt=contours[0]
+    
     #Perimetro
     perimeter = cv2.arcLength(cnt, True)
     
@@ -83,7 +52,7 @@ for j in range(1,num_labels):
     
     #Relación de aspecto
     x,y,w,h = cv2.boundingRect(cnt)
-    aspect_ratio = float(w)/h
+    aspect_ratio = float(w/h)
     
     #Solided
     hull = cv2.convexHull(cnt)
@@ -96,11 +65,28 @@ for j in range(1,num_labels):
     
     #Circularidad
     circularity = 4*np.pi*(area/(perimeter*perimeter))
-    texto='Figura:',j
-    lista.append([texto,'perimetro:',perimeter,'area:',area,'Relacion de aspecto:',aspect_ratio,'solided:',solidity,'circularidad:',circularity])
     
-plt.subplot(1,2,1),plt.imshow(img_final,'gray')   
-plt.subplot(1, 2 ,2),plt.imshow(img_color,'gray')
+    # Número de agujeros
+    num_agujeros = 0
+    for i in range(hierarchy[:,:,0].size):
+        if hierarchy[0,i,3] != -1:
+            num_agujeros += 1
+    
+    #Rectangularidad y cg
+    marco_x, marco_y,_,_, marco_area = stats[j]
+    if marco_area!=0:
+        rectangularidad= area/marco_area
+    
+    cgx,cgy=centroids[j]
+    cg = (cgx-marco_x, cgy-marco_y)
+    
+    
+    texto='Figura:',j
+    lista.append([texto,'perimetro:',perimeter,'area:',area,'Relacion de aspecto:',aspect_ratio,'solided:',solidity,'circularidad:',circularity
+                  ,'n agujeros',num_agujeros,'rectangularidad',rectangularidad,'centro gravedad',cg])
+    
+plt.imshow(img_color,'gray')
+plt.axis(False)
 print(lista)
 
 

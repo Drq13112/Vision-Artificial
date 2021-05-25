@@ -3,6 +3,8 @@
 Created on Thu Mar 18 10:05:11 2021
 
 @author: david
+
+Extracción de números de sudoku
 """
 
 import cv2
@@ -23,9 +25,19 @@ img_bin=cv2.dilate(img_bin,Mat)
 
 #Determino la cantidad de objetos y etiqueto cada uno
 num_labels, img_labels, stats, cg = cv2.connectedComponentsWithStats(img_bin)
+"""
+Creo una imagen de cada numero por separado que ha detectado y lo examino
+para ver si cumple las caractericticas y por tanto descartarlo o incluirlo 
 
-#Creo una imagen de cada numero por separado que ha detectado y lo examino
-#para ver si cumple las caractericticas y por tanto descartarlo o incluirlo 
+Para diferenciar los 8 del resto de numeros me he fijado en la cantidad de agujeros
+que tienen, es decir, la cantidad de contornos dentro del contorno exterior.
+Para ello he definido a findCountours con cv2.RETR_CCOMP y he seleccionado aquellos
+objetos que tienen 3 contornos, el exterior y los dos de dentro.
+
+Para diferenciar al 1 del resto me he fijado en la relación de aspecto.
+Pues son el único número que es más alto que ancho.
+"""
+
 img_final_1=np.zeros_like(img_labels, np.uint8)
 img_final_8=img_final_1
 for j in range(1,num_labels):
@@ -39,4 +51,5 @@ for j in range(1,num_labels):
     if h/w>2:
         img_final_1=img_aux+img_final_1
  
-plt.imshow(img_final_8,'gray')
+plt.imshow(img_final_1,'gray')
+plt.axis(False)

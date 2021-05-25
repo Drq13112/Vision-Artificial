@@ -3,6 +3,7 @@
 Created on Sun May 23 01:37:23 2021
 
 @author: david
+
 Deteccion de esquinas de rectangulos
 """
 
@@ -10,7 +11,11 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-img=cv2.imread('../imagenes/matricula_coche_3.jpg',0)
+
+
+
+
+img=cv2.imread('../imagenes/matricula_coche_2.jpg',0)
 
 
 #Binarización de otsu tras un suavizado gaussiano
@@ -66,7 +71,6 @@ for etiq in range(1,num_labels):
             
             #Muestro por la terminal
             img_final=img_aux
-            
             #Paso a la imagen a RGB para pintar de color los puntos
             img_final=cv2.cvtColor(img_final,cv2.COLOR_GRAY2RGB)
             cv2.circle(img_final,(cx, cy), 5, (0,0,255), -1)
@@ -96,10 +100,18 @@ for etiq in range(1,num_labels):
                 if modulo>modulo_max:
                     
                     modulo_max=modulo
-                    punto_aux=punto
-            
+                    punto_max=punto
+                    
+                    
+                    #Pongo esta codición para que me examine las 4 esquinas 
+                    #y posteriormente me dibuje la más alejada
                 if j==3:
-                    cv2.circle(img_final,punto_aux, 5, (0,0,255), -1)
+                    
+                    # Dibujamos los ejes de la matrícula, la esquina y la recta que los une
+                    cv2.line(img_final,(cx,y),(cx,y+h),(255,0,0),5)
+                    cv2.line(img_final,(x,cy),(x+w,cy),(255,0,0),5)
+                    cv2.circle(img_final,punto_max, 5, (0,0,255), -1)
+                    cv2.line(img_final,(cx, cy),punto_max,(0,255,0),5)
             
         
 cv2.imshow("Img_final",img_final)

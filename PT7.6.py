@@ -3,16 +3,18 @@
 Created on Mon Apr 19 09:45:11 2021
 
 @author: david
+
+Detección de circunferencias mediante transformada de Hough
 """
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-img = cv2.imread('../../imagenes/monedas.jpg',0)
+img = cv2.imread('../imagenes/pelotas.jpg',0)
 output = img_color=cv2.merge([img,img,img])
 # detect circles in the image
-circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.1, 10)
+circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.5, 10)
 # ensure at least some circles were found
 if circles is not None:
 	# convert the (x, y) coordinates and radius of the circles to integers
@@ -26,5 +28,5 @@ if circles is not None:
 
 plt.imshow(output)
 plt.axis('off')
-plt.title("rectas")
+plt.title("circulos")
 plt.show()

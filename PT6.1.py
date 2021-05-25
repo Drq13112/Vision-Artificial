@@ -3,6 +3,8 @@
 Created on Thu Mar 18 10:13:13 2021
 
 @author: david
+
+Reposicionamiento de objeto para su análisis posterior 
 """
 
 import cv2
@@ -10,7 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def Recoloca_calculadora(img):
-    # Primero suavizamos la imagen y luego la binarizamoscon Otsu
+    
+    # Primero suavizamos la imagen y luego la binarizamos con Otsu
     img_suavizada = cv2.medianBlur(img,3)
     _, img_bin = cv2.threshold(img_suavizada, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
@@ -49,7 +52,15 @@ def Recoloca_calculadora(img):
     img_abajo=img_bin[int(img_bin.shape[0]/2):img_bin.shape[0]]
     img_arriba=img_bin[0:int(img_bin.shape[0]/2)]
     
-    #Defino el algoritmo que determina si la imagen esta bien o está al revés
+    """
+    Defino el algoritmo que determina si la imagen esta bien o está al revés
+    Para ello parto la imagen en 2 y miro la cantidad de contornos que hay en cada parte
+    Sé que la calculadora tiene una pantalla, de modo que la parte de arriba tiene que tener
+    2 contornos. Uno exterior y otro interior.
+    
+    En mi caso he examinado la parte de abajo, si hay dos contornos, la imagen está al revés.
+    De lo contrario la imagen está bien orientada
+    """
     contours, hierarchy = cv2.findContours(img_abajo, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
     if hierarchy.shape[1]>1:
         print('esta al reves')   

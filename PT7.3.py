@@ -85,7 +85,6 @@ for etiq in range(1,num_labels):
         aspect_ratio[etiq][0]=w/h
         
         #Calculo el centro de gravedad a traves de los momentos
-        
         momentos = cv2.moments(cnt[i])
         cx = int(momentos['m10']/momentos['m00'])
         cy = int(momentos['m01']/momentos['m00'])
